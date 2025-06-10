@@ -1,19 +1,32 @@
 console.log("Spotify premium");
 
+const found = document.getElementById("found");
+const searchSection = document.getElementById("searchSection");
 const searchInput = document.getElementById("searchField");
 
 function search() {
   //input deve prendere il valore che l'utente sta cercando
   let elementoCercato = searchInput.value;
   console.log(elementoCercato);
+  //passa la fetch, cosí chiama in automatico il parametro
+  fetchBrani(elementoCercato, true);
+
+  //rendi le sezioni d-none
+  let eminemSection = document.getElementById("eminem");
+  let queenSection = document.getElementById("queen");
+  let metallicaSection = document.getElementById("metallica");
+
+  eminemSection.classList = "d-none";
+  queenSection.classList = "d-none";
+  metallicaSection.classList = "d-none";
 }
 
-function fetchBrani(artista) {
+function fetchBrani(artista, search = false) {
   fetch("https://striveschool-api.herokuapp.com/api/deezer/search?q=" + artista)
     .then((response) => response.json())
     .then((data) => {
       console.log(data);
-      renderingCanzoni(data.data, artista);
+      renderingCanzoni(data.data, artista, (search = false));
     });
 }
 
@@ -21,9 +34,14 @@ fetchBrani("eminem");
 fetchBrani("queen");
 fetchBrani("metallica");
 
-function renderingCanzoni(canzoni, artista) {
-  const artistaSezione = document.getElementById(`${artista}Section`);
-  const artistaBox = document.getElementById(artista);
+function renderingCanzoni(canzoni, artista, search = false) {
+  let artistaSezione = document.getElementById(`${artista}Section`);
+  let artistaBox = document.getElementById(artista);
+
+  if (search) {
+    artistaSezione = searchSection;
+    artistaBox = found;
+  }
 
   //Rimuovi il conenuto precedente
   artistaSezione.innerHTML = "";
@@ -35,13 +53,13 @@ function renderingCanzoni(canzoni, artista) {
     canzoneCard.className = "card h-100 shadow-sm";
 
     const canzoneImg = document.createElement("img");
-    canzoneImg.className = "card-img-top";
+    canzoneImg.className = "card-img-top img-fluid";
     canzoneImg.src = canzone.album.cover_medium;
     canzoneImg.setAttribute("alt", canzone.titolo);
     canzoneCard.appendChild(canzoneImg);
 
     const cardBody = document.createElement("div");
-    cardBody.className = "card-body";
+    cardBody.className = "card-body text-dark";
 
     const cardTitolo = document.createElement("h5");
     cardTitolo.className = "card-title";
@@ -55,6 +73,7 @@ function renderingCanzoni(canzoni, artista) {
 
     const audio = document.createElement("audio");
     audio.setAttribute("controls", true);
+    audio.className = "w-100";
     audio.src = canzone.preview;
     cardBody.appendChild(audio);
 
